@@ -34,7 +34,7 @@ After `require('mac-ca')` MacOs' Root CAs are found, deduplicated and installed 
 For use in other places, these certificates are also available via `.all()` method (in [node-forge][]'s format).
 
 ```js
-let ca = require('win-ca')
+let ca = require('mac-ca')
 let forge = require('node-forge')
 
 for (let crt of ca.all())
@@ -49,7 +49,7 @@ contains modern certificates,
 
 To fix this, one can pass `format` parameter to `.all` method:
 ```js
-let ca = require('win-ca')
+let ca = require('mac-ca')
 
 for (let crt of ca.all(ca.der2.pem))
   console.log(crt)
@@ -67,7 +67,7 @@ der2.der | 0 | DER-format (binary, Node's [Buffer][])
 One can enumerate Root CAs himself using `.each()` method:
 
 ```js
-let ca = require('win-ca')
+let ca = require('mac-ca')
 
 ca.each(crt=>
   console.log(forge.pki.certificateToPem(crt)))
