@@ -2,7 +2,8 @@ const https = require('https');
 const formater = require('./lib/formater');
 
 if (process.platform !== 'darwin') {
-  module.exports.all = [];
+  module.exports.all = () => [];
+  module.exports.each = () => {};
   return;
 }
 
@@ -26,9 +27,9 @@ function duplicated(cert, index, arr) {
   return arr.indexOf(cert) === index;
 }
 
-const all = allTrusted.concat(allRoot).filter(duplicated);
+const all = allTrusted.concat(allRoot);
 
-all.forEach(cert => ca.push(cert));
+all.filter(duplicated).forEach(cert => ca.push(cert));
 
 module.exports.der2 = formater.validFormats;
 
@@ -36,4 +37,15 @@ module.exports.all = function(format){
   return all
     .map(formater.transform(format))
     .filter(c => c);
+};
+
+module.exports.each = function(format, callback) {
+  if (typeof format === 'function') {
+    callback = format;
+    format = undefined;
+  }
+  return all
+    .map(formater.transform(format))
+    .filter(c => c)
+    .forEach(callback);
 };
