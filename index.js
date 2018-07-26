@@ -1,5 +1,5 @@
 const https = require('https');
-const formater = require('./lib/formater');
+const formatter = require('./lib/formatter');
 
 if (process.platform !== 'darwin') {
   module.exports.all = () => [];
@@ -31,11 +31,11 @@ const all = allTrusted.concat(allRoot);
 
 all.filter(duplicated).forEach(cert => ca.push(cert));
 
-module.exports.der2 = formater.validFormats;
+module.exports.der2 = formatter.validFormats;
 
 module.exports.all = function(format){
   return all
-    .map(formater.transform(format))
+    .map(formatter.transform(format))
     .filter(c => c);
 };
 
@@ -45,7 +45,7 @@ module.exports.each = function(format, callback) {
     format = undefined;
   }
   return all
-    .map(formater.transform(format))
+    .map(formatter.transform(format))
     .filter(c => c)
     .forEach(callback);
 };
