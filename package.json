@@ -14,7 +14,7 @@
   "author": "José F. Romaniello <jfromaniello@gmail.com> (https://joseoncode.com)",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "node-forge": "^0.10.0"
+    "node-forge": "^1.3.0"
   },
   "devDependencies": {
     "eslint": "^5.2.0"
