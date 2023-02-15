@@ -23,37 +23,31 @@ This package is intended to fetch Root CAs from MacOS "SystemRootCertificates.ke
 
 ## Usage
 
-Just say `npm install --save mac-ca` and then call `require('mac-ca')`.
+Just say `npm install --save mac-ca` and then call `require('mac-ca').addToGlobalAgent();`.
 
-It is safe to use it under other OSes (not MacOS).
+If called in other operative systems the method will do nothing.
 
 ## API
 
-After `require('mac-ca')` MacOs' Root CAs are found, deduplicated and installed to `https.globalAgent.options.ca` so they are automatically used for all requests with Node.js' https module.
+After `require('mac-ca').addToGlobalAgent()` MacOs' Root CAs are found, deduplicated and installed to `https.globalAgent.options.ca` so they are automatically used for all requests with Node.js' https module.
 
-For use in other places, these certificates are also available via `.all()` method (in [node-forge][]'s format).
+For use in other places, these certificates are also available via `.get()` method (in [node-forge][]'s format).
 
 ```js
 let ca = require('mac-ca')
 let forge = require('node-forge')
 
-for (let crt of ca.all())
+for (let crt of ca.get())
   console.log(forge.pki.certificateToPem(crt))
 ```
-Unfortunately, `node-forge` at the time of writing is unable to
-parse non-RSA certificates
-(namely, ECC certificates becoming more popular).
-If your *Trusted Root Certification Authorities* store
-contains modern certificates,
-`.all()` method will throw exception.
 
-To fix this, one can pass `format` parameter to `.all` method:
+You can also specify the format as follows:
+
 ```js
-let ca = require('mac-ca')
-
-for (let crt of ca.all(ca.der2.pem))
-  console.log(crt)
+ca.get({ format: ca.Format.der })
 ```
+
+
 Available values for `format` are:
 
 | Constant | Value | Meaning
@@ -64,18 +58,10 @@ der2.der | 0 | DER-format (binary, Node's [Buffer][])
 |der2.asn1| 3 | ASN.1-parsed certificate
 | * | * | Certificate in `node-forge` format (RSA only)
 
-One can enumerate Root CAs himself using `.each()` method:
-
-```js
-let ca = require('mac-ca')
-
-ca.each(crt=>
-  console.log(forge.pki.certificateToPem(crt)))
-```
-
-But this list may contain duplicates.
-
-Asynchronous enumeration is not supported by this module yet.
+Other options for `get`:
+- `keychain` (defaults to `all`): it could be `all`, `current` or `SystemRootCertificates`.
+- `unique` (defaults to `true`): exclude duplicated certificates found.
+- `excludeBundled` (defaults to `true`): exclude certificates found in node.js's `tls.rootCertificates`.
 
 ## Credits
 
