@@ -1,8 +1,6 @@
-This module is similar to [win-ca][] but for Mac OS. 
-
 # mac-ca
 
-Get MacOS System Root certificates for [Node.js][].
+Get MacOS System certificates into [Node.js][].
 
 ## Rationale
 
@@ -12,7 +10,9 @@ Get MacOS System Root certificates for [Node.js][].
 > rather than relying on the system's trust store...
 > [Read more][node/4175]
 
-This package is intended to fetch Root CAs from MacOS "SystemRootCertificates.keychain" and make them available to [Node.js] application with minimal efforts.
+This is most of the time ok, but there are cases where you might for example want to use TLS in development with self signed certificates for which you have a root certificate in your local store. Eg: [mkcert](https://github.com/FiloSottile/mkcert)
+
+This package is intended to fetch Root CAs from MacOS "SystemRootCertificates.keychain" and the user's keychain into [Node.js].
 
 ### Advantages
 
@@ -23,22 +23,30 @@ This package is intended to fetch Root CAs from MacOS "SystemRootCertificates.ke
 
 ## Usage
 
-Just say `npm install --save mac-ca` and then call `require('mac-ca').addToGlobalAgent();`.
+Install with
+```
+npm install --save mac-ca
+```
 
-If called in other operative systems the method will do nothing.
+And then use it as follows:
+```
+require('mac-ca').addToGlobalAgent();
+```
+
+If called in other operative systems the method will just do nothing.
 
 ## API
 
-After `require('mac-ca').addToGlobalAgent()` MacOs' Root CAs are found, deduplicated and installed to `https.globalAgent.options.ca` so they are automatically used for all requests with Node.js' https module.
+After `require('mac-ca').addToGlobalAgent()` MacOs' Root CAs are found, deduplicated and installed to `https.globalAgent.options.ca` so they are automatically used for all requests with Node.js' https module and any higher-level library like axios, node-fetch or request.
 
-For use in other places, these certificates are also available via `.get()` method (in [node-forge][]'s format).
+For use in other places, these certificates are also available via `.get()` method.
 
 ```js
 let ca = require('mac-ca')
 let forge = require('node-forge')
 
-for (let crt of ca.get())
-  console.log(forge.pki.certificateToPem(crt))
+for (let pem of ca.get())
+  console.log(pem)
 ```
 
 You can also specify the format as follows:
@@ -70,6 +78,7 @@ Uses [node-forge][] and is heavily inspired by **Stas Ukolov**'s [win-ca][].
 See also [OpenSSL::Win::Root][].
 
 [win-ca]: https://github.com/ukoloff/win-ca
+[mkcert]: https://github.com/FiloSottile/mkcert
 [node-forge]: https://github.com/digitalbazaar/forge
 [OpenSSL::Win::Root]: https://github.com/ukoloff/openssl-win-root
 [Node.js]: http://nodejs.org/
