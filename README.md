@@ -1,4 +1,4 @@
-This module is similar to [win-ca][] but for Mac OS. In fact I have copied most of its documentation and I have tried to maintain api compatibility.
+This module is similar to [win-ca][] but for Mac OS. 
 
 # mac-ca
 
