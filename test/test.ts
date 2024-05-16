@@ -2,7 +2,7 @@ import { rootCertificates } from 'tls';
 import * as assert from 'assert';
 import { globalAgent } from 'https';
 import * as macca from '../src';
-
+import { getGlobalDispatcher } from 'undici';
 describe('macca', () => {
   it('should properly exclude node.js certs', () => {
     const excludingNodejs = macca.get({ excludeBundled: true, format: macca.Format.fingerprint });

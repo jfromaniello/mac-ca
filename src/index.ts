@@ -2,7 +2,7 @@ import { globalAgent } from 'https';
 import { rootCertificates } from 'tls';
 import { spawnSync } from 'child_process';
 import * as forge from 'node-forge';
-
+import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { Format, convert } from './formatter';
 import { asn1 } from './asn1';
 
@@ -116,6 +116,12 @@ export const addToGlobalAgent = (params: AddToGAType = getParamsDefaults) => {
     .forEach((cert) => cas.push(cert));
 
   globalAgent.options.ca = cas;
+
+  setGlobalDispatcher(new Agent({
+    connect: {
+      ca: cas
+    }
+  }));
 };
 
 export { Format, convert };
