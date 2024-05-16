@@ -1,6 +1,6 @@
 {
   "name": "mac-ca",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Get Mac OS Root certificates",
   "main": "./dist/index.js",
   "exports": {
