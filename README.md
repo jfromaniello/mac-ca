@@ -24,13 +24,23 @@ This package is intended to fetch Root CAs from MacOS "SystemRootCertificates.ke
 ## Usage
 
 Install with
+
 ```
 npm install --save mac-ca
 ```
 
 And then use it as follows:
+
 ```
 require('mac-ca').addToGlobalAgent();
+//or
+require('mac-ca/register');
+```
+
+You can also do:
+
+```
+node --require mac-ca/register app.js
 ```
 
 If called in other operative systems the method will just do nothing.
@@ -42,31 +52,30 @@ After `require('mac-ca').addToGlobalAgent()` MacOs' Root CAs are found, deduplic
 For use in other places, these certificates are also available via `.get()` method.
 
 ```js
-let ca = require('mac-ca')
-let forge = require('node-forge')
+let ca = require("mac-ca");
+let forge = require("node-forge");
 
-for (let pem of ca.get())
-  console.log(pem)
+for (let pem of ca.get()) console.log(pem);
 ```
 
 You can also specify the format as follows:
 
 ```js
-ca.get({ format: ca.Format.der })
+ca.get({ format: ca.Format.der });
 ```
-
 
 Available values for `format` are:
 
-| Constant | Value | Meaning
-|---|---:|---
-der2.der | 0 | DER-format (binary, Node's [Buffer][])
-|der2.pem | 1 | PEM-format (text, Base64-encoded)
-|der2.txt| 2 | PEM-format plus some info as text
-|der2.asn1| 3 | ASN.1-parsed certificate
-| * | * | Certificate in `node-forge` format (RSA only)
+| Constant  | Value | Meaning                                       |
+| --------- | ----: | --------------------------------------------- |
+| der2.der  |     0 | DER-format (binary, Node's [Buffer][])        |
+| der2.pem  |     1 | PEM-format (text, Base64-encoded)             |
+| der2.txt  |     2 | PEM-format plus some info as text             |
+| der2.asn1 |     3 | ASN.1-parsed certificate                      |
+| \*        |    \* | Certificate in `node-forge` format (RSA only) |
 
 Other options for `get`:
+
 - `keychain` (defaults to `all`): it could be `all`, `current` or `SystemRootCertificates`.
 - `unique` (defaults to `true`): exclude duplicated certificates found.
 - `excludeBundled` (defaults to `true`): exclude certificates found in node.js's `tls.rootCertificates`.
