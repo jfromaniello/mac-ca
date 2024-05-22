@@ -1,8 +1,9 @@
-import { globalAgent } from 'https';
+import * as https from 'https';
 import { rootCertificates } from 'tls';
 import { spawnSync } from 'child_process';
 import * as forge from 'node-forge';
-import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
+import { Agent, setGlobalDispatcher } from 'undici';
+
 import { Format, convert } from './formatter';
 import { asn1 } from './asn1';
 
@@ -33,6 +34,8 @@ type GetParams = {
    */
   format?: Format
 };
+
+const { globalAgent } = https;
 
 const getParamsDefaults: GetParams = {
   keychain: 'all',
@@ -68,7 +71,7 @@ export function get(params: GetParams = getParamsDefaults): string[] | forge.uti
     result = [...result, ...root];
   }
 
-  if (params.keychain === 'all' || params.keychain === 'SystemRootCertificates') {
+  if (params.keychain === 'all' || params.keychain === 'current') {
     const trusted = spawnSync('/usr/bin/security', args)
       .stdout.toString()
       .split(splitPattern)
@@ -112,11 +115,30 @@ export const addToGlobalAgent = (params: AddToGAType = getParamsDefaults) => {
     cas = Array.from(originalCA);
   }
 
-  get({ ...getParamsDefaults, ...params, format: Format.pem })
-    .forEach((cert) => cas.push(cert));
+  get({
+    ...getParamsDefaults,
+    ...params,
+    format: Format.pem,
+    excludeBundled: false
+  }).forEach((cert) => cas.push(cert));
 
+  //Sets the root certs in https.globalAgent
   globalAgent.options.ca = cas;
 
+  //Modify the https.Agent constructor so that each new instance of the agent
+  //inherits the root certs from the global agent.
+  // @ts-ignore
+  https.Agent = (function (original) {
+    return function (options?: https.AgentOptions) {
+      const opts = typeof options !== 'undefined' ? { ...options } : {};
+      if (typeof opts.ca === 'undefined') {
+        opts.ca = cas;
+      }
+      return original.call(this, opts);
+    };
+  })(https.Agent);
+
+  //Sets the root certs in undici. This is what the new native "fetch" uses.
   setGlobalDispatcher(new Agent({
     connect: {
       ca: cas
