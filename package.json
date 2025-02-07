@@ -15,7 +15,7 @@
     "url": "https://github.com/jfromaniello/mac-ca.git"
   },
   "scripts": {
-    "test": "mocha --reporter spec --require ts-node/register test/**",
+    "test": "mocha --exit --timeout 5000 --reporter spec --require ts-node/register test/**",
     "lint": "eslint .",
     "prepare": "tsc"
   },
