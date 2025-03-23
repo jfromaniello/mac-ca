@@ -129,13 +129,15 @@ export const addToGlobalAgent = (params: AddToGAType = getParamsDefaults) => {
   //inherits the root certs from the global agent.
   // @ts-ignore
   https.Agent = (function (original) {
-    return function (options?: https.AgentOptions) {
+    var modifiedAgent = function (options?: https.AgentOptions) {
       const opts = typeof options !== 'undefined' ? { ...options } : {};
       if (typeof opts.ca === 'undefined') {
         opts.ca = cas;
       }
       return original.call(this, opts);
     };
+    modifiedAgent.prototype = original.prototype;
+    return modifiedAgent;
   })(https.Agent);
 
   //Sets the root certs in undici. This is what the new native "fetch" uses.
